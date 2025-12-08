@@ -1,0 +1,48 @@
+{
+    "name": "@tspvivek/baasix-mcp-server",
+    "version": "0.0.4",
+    "description": "Model Context Protocol server for Baasix headless CMS operations",
+    "type": "module",
+    "main": "baasix/index.js",
+    "files": [
+        "baasix/",
+        "README.md"
+    ],
+    "scripts": {
+        "start": "dotenv -e .env.production node server.js",
+        "development": "dotenv -e .env node server.js",
+        "dev": "dotenv -e .env node --watch server.js",
+        "test": "echo 'Testing MCP server...' && echo '{\"jsonrpc\":\"2.0\",\"method\":\"tools/list\",\"id\":1}' | dotenv -e .env node server.js",
+        "debug": "dotenv -e .env npx @modelcontextprotocol/inspector server.js"
+    },
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.0.3",
+        "axios": "^1.6.0",
+        "dotenv": "^16.3.0",
+        "zod": "^3.23.8"
+    },
+    "devDependencies": {
+        "@modelcontextprotocol/inspector": "^0.1.0",
+        "dotenv-cli": "^7.4.4"
+    },
+    "peerDependencies": {
+        "node": ">=18.0.0"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "keywords": [
+        "mcp",
+        "model-context-protocol",
+        "claude",
+        "baasix",
+        "cms",
+        "headless",
+        "api"
+    ],
+    "author": "Vivek Palanisamy",
+    "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    }
+}
