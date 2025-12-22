@@ -1,7 +1,7 @@
 {
     "name": "@tspvivek/baasix-mcp-server",
-    "version": "0.0.4",
-    "description": "Model Context Protocol server for Baasix headless CMS operations",
+    "version": "0.1.0",
+    "description": "Model Context Protocol (MCP) server for Baasix Backend-as-a-Service - provides 40+ tools for schema management, CRUD operations with 50+ filter operators, relationships, permissions, files, workflows, and more",
     "type": "module",
     "main": "baasix/index.js",
     "files": [
@@ -36,12 +36,21 @@
         "model-context-protocol",
         "claude",
         "baasix",
-        "cms",
-        "headless",
-        "api"
+        "baas",
+        "backend-as-a-service",
+        "rest-api",
+        "postgresql",
+        "drizzle-orm",
+        "headless-cms",
+        "api-generator"
     ],
     "author": "Vivek Palanisamy",
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/tspvivek/baasix-mcp.git"
+    },
+    "homepage": "https://www.baasix.com",
     "publishConfig": {
         "access": "public"
     }
