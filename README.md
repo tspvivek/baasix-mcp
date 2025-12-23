@@ -60,9 +60,16 @@ npm start
 - `npm test` - Run tests
 - `npm run debug` - Start with MCP inspector for debugging
 
-## Integration with Claude Desktop
+## IDE Integration
+
+Baasix MCP Server integrates with various AI-powered development tools. Below are configuration examples for popular IDEs and tools.
+
+### Claude Desktop
 
 Add to your Claude Desktop configuration (`claude_desktop_config.json`):
+
+**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`  
+**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
 {
@@ -70,6 +77,93 @@ Add to your Claude Desktop configuration (`claude_desktop_config.json`):
     "baasix": {
       "command": "node",
       "args": ["/path/to/baasix/mcp/server.js"],
+      "env": {
+        "BAASIX_URL": "http://localhost:8056",
+        "BAASIX_EMAIL": "admin@baasix.com",
+        "BAASIX_PASSWORD": "admin@123"
+      }
+    }
+  }
+}
+```
+
+### Claude Code (Anthropic CLI)
+
+For Claude Code CLI, create a `.mcp.json` file in your project root:
+
+```json
+{
+  "mcpServers": {
+    "baasix": {
+      "command": "node",
+      "args": ["./mcp-server.js"],
+      "env": {
+        "BAASIX_URL": "http://localhost:8056",
+        "BAASIX_EMAIL": "admin@baasix.com",
+        "BAASIX_PASSWORD": "admin@123"
+      }
+    }
+  }
+}
+```
+
+Or add via CLI:
+```bash
+claude mcp add baasix npm run start
+```
+
+### VS Code with GitHub Copilot
+
+For VS Code with GitHub Copilot, create `.vscode/mcp.json` in your project:
+
+```jsonc
+{
+  "servers": {
+    "baasix": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["./mcp-server.js"],
+      "env": {
+        "BAASIX_URL": "http://localhost:8056",
+        "BAASIX_EMAIL": "admin@baasix.com",
+        "BAASIX_PASSWORD": "admin@123"
+      }
+    }
+  },
+  "inputs": []
+}
+```
+
+### Cursor IDE
+
+For Cursor, add to your Cursor settings or create a project-level configuration:
+
+```json
+{
+  "mcpServers": {
+    "baasix": {
+      "command": "node",
+      "args": ["./mcp-server.js"],
+      "env": {
+        "BAASIX_URL": "http://localhost:8056",
+        "BAASIX_EMAIL": "admin@baasix.com",
+        "BAASIX_PASSWORD": "admin@123"
+      }
+    }
+  }
+}
+```
+
+### Using the npm Package
+
+If you're using the published npm package instead of the source:
+
+```json
+{
+  "mcpServers": {
+    "baasix": {
+      "command": "npx",
+      "args": ["@tspvivek/baasix-mcp-server"],
       "env": {
         "BAASIX_URL": "http://localhost:8056",
         "BAASIX_EMAIL": "admin@baasix.com",
