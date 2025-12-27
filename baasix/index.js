@@ -185,10 +185,29 @@ FIELD TYPES:
 - Boolean: true/false
 - Date, DateTime, Time: Date/time
 - UUID: With defaultValue.type: "UUIDV4"
+- SUID: Short unique ID with defaultValue.type: "SUID"
 - JSONB: JSON with indexing
 - Array: values.type specifies element type
 - Geometry, Geography: PostGIS spatial
 - Enum: values.values array
+
+DEFAULT VALUE TYPES:
+- { type: "UUIDV4" } - Random UUID v4
+- { type: "SUID" } - Short unique ID
+- { type: "NOW" } - Current timestamp
+- { type: "AUTOINCREMENT" } - Auto-incrementing integer
+- { type: "SQL", value: "..." } - Custom SQL expression
+- Static values: "active", false, 0, etc.
+
+VALIDATION RULES:
+- min: number - Minimum value (numeric fields)
+- max: number - Maximum value (numeric fields)
+- isInt: true - Must be integer
+- notEmpty: true - String cannot be empty
+- isEmail: true - Valid email format
+- isUrl: true - Valid URL format
+- len: [min, max] - String length range
+- is/matches: "regex" - Pattern matching
 
 SCHEMA OPTIONS:
 - timestamps: true adds createdAt/updatedAt
@@ -200,8 +219,11 @@ EXAMPLE:
   "timestamps": true,
   "fields": {
     "id": {"type": "UUID", "primaryKey": true, "defaultValue": {"type": "UUIDV4"}},
-    "name": {"type": "String", "allowNull": false, "values": {"length": 255}},
-    "price": {"type": "Decimal", "values": {"precision": 10, "scale": 2}}
+    "sku": {"type": "SUID", "unique": true, "defaultValue": {"type": "SUID"}},
+    "name": {"type": "String", "allowNull": false, "values": {"length": 255}, "validate": {"notEmpty": true}},
+    "price": {"type": "Decimal", "values": {"precision": 10, "scale": 2}, "validate": {"min": 0}},
+    "email": {"type": "String", "validate": {"isEmail": true}},
+    "quantity": {"type": "Integer", "defaultValue": 0, "validate": {"isInt": true, "min": 0}}
   }
 }`,
                         inputSchema: {

@@ -394,15 +394,31 @@ When using `baasix_create_schema`:
         primaryKey: true,
         defaultValue: {type: "UUIDV4"}
       },
+      sku: {
+        type: "SUID",
+        unique: true,
+        defaultValue: {type: "SUID"}
+      },
       name: {
         type: "String",
         allowNull: false,
-        values: {length: 255}
+        values: {length: 255},
+        validate: {notEmpty: true, len: [3, 255]}
       },
       price: {
         type: "Decimal",
         values: {precision: 10, scale: 2},
-        defaultValue: 0.00
+        defaultValue: 0.00,
+        validate: {min: 0, max: 999999.99}
+      },
+      quantity: {
+        type: "Integer",
+        defaultValue: 0,
+        validate: {isInt: true, min: 0}
+      },
+      email: {
+        type: "String",
+        validate: {isEmail: true}
       },
       tags: {
         type: "Array",
@@ -418,6 +434,65 @@ When using `baasix_create_schema`:
 }
 ```
 
+### Field Validation Rules
+
+| Rule | Type | Description |
+|------|------|-------------|
+| `min` | number | Minimum value for numeric fields |
+| `max` | number | Maximum value for numeric fields |
+| `isInt` | boolean | Validate as integer |
+| `notEmpty` | boolean | String cannot be empty |
+| `isEmail` | boolean | Valid email format |
+| `isUrl` | boolean | Valid URL format |
+| `len` | [min, max] | String length range |
+| `is` / `matches` | regex | Pattern matching |
+
+```javascript
+// Validation examples
+{
+  "email": {
+    "type": "String",
+    "validate": {"isEmail": true, "notEmpty": true}
+  },
+  "age": {
+    "type": "Integer",
+    "validate": {"isInt": true, "min": 0, "max": 120}
+  },
+  "username": {
+    "type": "String",
+    "validate": {"notEmpty": true, "len": [3, 50]}
+  },
+  "phone": {
+    "type": "String",
+    "validate": {"matches": "^\\+?[1-9]\\d{1,14}$"}
+  }
+}
+```
+
+### Default Value Types
+
+| Type | Description |
+|------|-------------|
+| `UUIDV4` | Random UUID v4 |
+| `SUID` | Short unique ID (compact, URL-safe) |
+| `NOW` | Current timestamp |
+| `AUTOINCREMENT` | Auto-incrementing integer |
+| `SQL` | Custom SQL expression |
+| Static | Any constant value (`"active"`, `false`, `0`) |
+
+```javascript
+// Default value examples
+{
+  "id": {"type": "UUID", "defaultValue": {"type": "UUIDV4"}},
+  "shortCode": {"type": "SUID", "defaultValue": {"type": "SUID"}},
+  "createdAt": {"type": "DateTime", "defaultValue": {"type": "NOW"}},
+  "orderNum": {"type": "Integer", "defaultValue": {"type": "AUTOINCREMENT"}},
+  "sortOrder": {"type": "Integer", "defaultValue": {"type": "SQL", "value": "(SELECT MAX(sort)+1 FROM items)"}},
+  "status": {"type": "String", "defaultValue": "pending"},
+  "isActive": {"type": "Boolean", "defaultValue": true}
+}
+```
+
 ### Supported Field Types
 - **String**: `values: {length: 255}` for VARCHAR
 - **Text**: Unlimited length text
@@ -427,6 +502,7 @@ When using `baasix_create_schema`:
 - **Boolean**: true/false
 - **Date**, **DateTime**, **Time**: Date/time values
 - **UUID**: `defaultValue: {type: "UUIDV4"}`
+- **SUID**: `defaultValue: {type: "SUID"}` - Short unique ID
 - **JSONB**: JSON with indexing
 - **Array**: `values: {type: "String|Integer|etc"}`
 - **Geometry**, **Geography**: PostGIS spatial types
