@@ -859,6 +859,88 @@ FILTER EXAMPLES:
                         },
                     },
 
+                    // Email Template Tools
+                    {
+                        name: "baasix_list_templates",
+                        description: "List all email templates with optional filtering",
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                filter: {
+                                    type: "object",
+                                    description: "Filter criteria (e.g., {type: {eq: 'magic_link'}})",
+                                },
+                                page: {
+                                    type: "number",
+                                    description: "Page number (default: 1)",
+                                    default: 1,
+                                },
+                                limit: {
+                                    type: "number",
+                                    description: "Templates per page (default: 10)",
+                                    default: 10,
+                                },
+                            },
+                        },
+                    },
+                    {
+                        name: "baasix_get_template",
+                        description: "Get a specific email template by ID",
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                id: {
+                                    type: "string",
+                                    description: "Template ID (UUID)",
+                                },
+                            },
+                            required: ["id"],
+                        },
+                    },
+                    {
+                        name: "baasix_update_template",
+                        description: `Update an email template's subject, description, or body content.
+
+TEMPLATE TYPES:
+- magic_link: Magic link authentication emails
+- invite: User invitation emails
+- password_reset: Password reset emails
+- welcome: Welcome emails
+- verification: Email verification emails
+
+AVAILABLE VARIABLES:
+- User: {{user.firstName}}, {{user.lastName}}, {{user.fullName}}, {{user.email}}
+- Tenant: {{tenant.name}}, {{tenant.logo}}, {{tenant.website}}
+- Auth: {{magicLink}}, {{magicCode}}, {{resetPasswordLink}}, {{inviteLink}}
+- DateTime: {{currentDate}}, {{currentTime}}, {{currentYear}}`,
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                id: {
+                                    type: "string",
+                                    description: "Template ID (UUID)",
+                                },
+                                subject: {
+                                    type: "string",
+                                    description: "Email subject line (supports variables like {{user.firstName}})",
+                                },
+                                description: {
+                                    type: "string",
+                                    description: "Template description",
+                                },
+                                body: {
+                                    type: "string",
+                                    description: "Template body as HTML string or GrapesJS project JSON",
+                                },
+                                isActive: {
+                                    type: "boolean",
+                                    description: "Whether the template is active",
+                                },
+                            },
+                            required: ["id"],
+                        },
+                    },
+
                     // Permission Tools
                     {
                         name: "baasix_list_roles",
@@ -1381,6 +1463,14 @@ EXAMPLE:
                         return await this.handleGetSettings(args);
                     case "baasix_update_settings":
                         return await this.handleUpdateSettings(args);
+
+                    // Email Templates
+                    case "baasix_list_templates":
+                        return await this.handleListTemplates(args);
+                    case "baasix_get_template":
+                        return await this.handleGetTemplate(args);
+                    case "baasix_update_template":
+                        return await this.handleUpdateTemplate(args);
 
                     // Permissions
                     case "baasix_list_roles":
@@ -1992,6 +2082,54 @@ EXAMPLE:
         const result = await baasixRequest("/settings", {
             method: "PUT",
             data: settings,
+        });
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify(result, null, 2),
+                },
+            ],
+        };
+    }
+
+    // Email Template Methods
+    async handleListTemplates(args) {
+        const { filter, page = 1, limit = 10 } = args;
+        const params = new URLSearchParams();
+        if (filter) params.append("filter", JSON.stringify(filter));
+        params.append("page", page.toString());
+        params.append("limit", limit.toString());
+
+        const templates = await baasixRequest(`/items/baasix_Template?${params}`);
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify(templates, null, 2),
+                },
+            ],
+        };
+    }
+
+    async handleGetTemplate(args) {
+        const { id } = args;
+        const template = await baasixRequest(`/items/baasix_Template/${id}`);
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify(template, null, 2),
+                },
+            ],
+        };
+    }
+
+    async handleUpdateTemplate(args) {
+        const { id, ...updateData } = args;
+        const result = await baasixRequest(`/items/baasix_Template/${id}`, {
+            method: "PATCH",
+            data: updateData,
         });
         return {
             content: [
