@@ -300,6 +300,10 @@ EXAMPLE:
                                             type: "boolean",
                                             description: "Whether the index should be unique",
                                         },
+                                        nullsNotDistinct: {
+                                            type: "boolean",
+                                            description: "When true, NULL values are considered equal for unique indexes (PostgreSQL 15+). Only applies when unique is true.",
+                                        },
                                     },
                                     required: ["name", "fields"],
                                 },
