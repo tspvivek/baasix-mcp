@@ -1160,6 +1160,88 @@ EXAMPLE:
                         },
                     },
 
+                    // Realtime Tools
+                    {
+                        name: "baasix_realtime_status",
+                        description: `Get the status of the realtime service including WAL configuration.
+
+Returns information about:
+- Whether realtime is initialized and consuming WAL
+- PostgreSQL replication configuration (wal_level, max_replication_slots)
+- Publication and replication slot status
+- Collections with realtime enabled`,
+                        inputSchema: {
+                            type: "object",
+                            properties: {},
+                            additionalProperties: false,
+                        },
+                    },
+                    {
+                        name: "baasix_realtime_config",
+                        description: `Check PostgreSQL replication configuration for WAL-based realtime.
+
+Returns:
+- walLevel: Should be 'logical' for realtime to work
+- maxReplicationSlots: Number of available replication slots
+- maxWalSenders: Number of WAL sender processes
+- replicationSlotExists: Whether the baasix slot exists
+- publicationExists: Whether the baasix publication exists
+- tablesInPublication: List of tables currently in the publication`,
+                        inputSchema: {
+                            type: "object",
+                            properties: {},
+                            additionalProperties: false,
+                        },
+                    },
+                    {
+                        name: "baasix_realtime_collections",
+                        description: "Get list of collections with realtime enabled and their action configurations",
+                        inputSchema: {
+                            type: "object",
+                            properties: {},
+                            additionalProperties: false,
+                        },
+                    },
+                    {
+                        name: "baasix_realtime_enable",
+                        description: `Enable realtime for a collection. Changes will be broadcast via WebSocket when data is modified.
+
+The realtime config is stored in the schema definition and can include specific actions to broadcast.`,
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                collection: {
+                                    type: "string",
+                                    description: "Collection name to enable realtime for",
+                                },
+                                actions: {
+                                    type: "array",
+                                    items: { type: "string", enum: ["insert", "update", "delete"] },
+                                    description: 'Actions to broadcast (default: ["insert", "update", "delete"])',
+                                },
+                                replicaIdentityFull: {
+                                    type: "boolean",
+                                    description: "Set REPLICA IDENTITY FULL for old values on UPDATE/DELETE (default: false)",
+                                },
+                            },
+                            required: ["collection"],
+                        },
+                    },
+                    {
+                        name: "baasix_realtime_disable",
+                        description: "Disable realtime for a collection",
+                        inputSchema: {
+                            type: "object",
+                            properties: {
+                                collection: {
+                                    type: "string",
+                                    description: "Collection name to disable realtime for",
+                                },
+                            },
+                            required: ["collection"],
+                        },
+                    },
+
                     // Utility Tools
                     {
                         name: "baasix_server_info",
@@ -1495,6 +1577,18 @@ EXAMPLE:
                         return await this.handleReloadPermissions(args);
                     case "baasix_update_permissions":
                         return await this.handleUpdatePermissions(args);
+
+                    // Realtime
+                    case "baasix_realtime_status":
+                        return await this.handleRealtimeStatus(args);
+                    case "baasix_realtime_config":
+                        return await this.handleRealtimeConfig(args);
+                    case "baasix_realtime_collections":
+                        return await this.handleRealtimeCollections(args);
+                    case "baasix_realtime_enable":
+                        return await this.handleRealtimeEnable(args);
+                    case "baasix_realtime_disable":
+                        return await this.handleRealtimeDisable(args);
 
                     // Utilities
                     case "baasix_server_info":
@@ -2269,6 +2363,77 @@ EXAMPLE:
         const result = await baasixRequest(`/permissions/${role}`, {
             method: "PUT",
             data: permissions,
+        });
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify(result, null, 2),
+                },
+            ],
+        };
+    }
+
+    // Realtime Methods
+    async handleRealtimeStatus(args) {
+        const result = await baasixRequest("/realtime/status");
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify(result, null, 2),
+                },
+            ],
+        };
+    }
+
+    async handleRealtimeConfig(args) {
+        const result = await baasixRequest("/realtime/config");
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify(result, null, 2),
+                },
+            ],
+        };
+    }
+
+    async handleRealtimeCollections(args) {
+        const result = await baasixRequest("/realtime/collections");
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify(result, null, 2),
+                },
+            ],
+        };
+    }
+
+    async handleRealtimeEnable(args) {
+        const { collection, actions, replicaIdentityFull } = args;
+        const result = await baasixRequest(`/realtime/collections/${collection}/enable`, {
+            method: "POST",
+            data: {
+                actions: actions || ["insert", "update", "delete"],
+                replicaIdentityFull: replicaIdentityFull || false,
+            },
+        });
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: JSON.stringify(result, null, 2),
+                },
+            ],
+        };
+    }
+
+    async handleRealtimeDisable(args) {
+        const { collection } = args;
+        const result = await baasixRequest(`/realtime/collections/${collection}/disable`, {
+            method: "POST",
         });
         return {
             content: [

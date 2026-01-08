@@ -6,7 +6,7 @@ A Model Context Protocol (MCP) server that provides Claude Desktop and other MCP
 
 ## Features
 
-- **40+ MCP Tools** for comprehensive Baasix operations
+- **45+ MCP Tools** for comprehensive Baasix operations
 - **Schema Management** - Create, update, delete collections and relationships
 - **CRUD Operations** - Full item management with powerful query capabilities
 - **50+ Filter Operators** - From basic comparison to geospatial and JSONB queries
@@ -16,6 +16,7 @@ A Model Context Protocol (MCP) server that provides Claude Desktop and other MCP
 - **File Management** - Upload, list, and manage files
 - **Authentication** - Login, register, magic links, invitations
 - **Multi-tenancy** - Tenant management and switching
+- **Realtime** - Enable/disable WAL-based realtime per collection
 
 ## Quick Start
 
@@ -254,6 +255,15 @@ If you're using the published npm package instead of the source:
 |------|-------------|
 | `baasix_get_settings` | Get application settings |
 | `baasix_update_settings` | Update settings |
+
+### Realtime (5 tools)
+| Tool | Description |
+|------|-------------|
+| `baasix_realtime_status` | Get realtime service status |
+| `baasix_realtime_config` | Check PostgreSQL WAL configuration |
+| `baasix_realtime_collections` | List collections with realtime enabled |
+| `baasix_realtime_enable` | Enable realtime for a collection |
+| `baasix_realtime_disable` | Disable realtime for a collection |
 
 ### Utilities (2 tools)
 | Tool | Description |
