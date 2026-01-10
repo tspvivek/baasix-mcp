@@ -334,14 +334,25 @@ EXAMPLE:
                         description: `Create a relationship between collections.
 
 RELATIONSHIP TYPES:
-- M2O (Many-to-One): Creates foreign key. products.category → categories
+- M2O (Many-to-One): Creates foreign key with auto-index. products.category → categories
 - O2M (One-to-Many): Virtual reverse of M2O. categories.products → products
-- M2M (Many-to-Many): Creates junction table. products ↔ tags
-- M2A (Many-to-Any): Polymorphic. comments → posts OR products
+- O2O (One-to-One): Creates foreign key with auto-index. user.profile → profiles
+- M2M (Many-to-Many): Creates junction table with auto-indexed FKs. products ↔ tags
+- M2A (Many-to-Any): Polymorphic junction table. comments → posts OR products
+
+AUTO-INDEXING:
+All foreign key columns are automatically indexed for better query performance:
+- M2O/O2O: Index on the FK column (e.g., category_Id)
+- M2M/M2A: Indexes on both FK columns in junction tables
+
+JUNCTION TABLES (M2M/M2A):
+- Auto-generated name: {source}_{target}_{name}_junction
+- Custom name: Use "through" property (max 63 chars for PostgreSQL)
+- Junction tables are marked with isJunction: true in schema
 
 EXAMPLE M2O:
 {
-  "name": "category",        // Creates category_Id field
+  "name": "category",        // Creates category_Id field + index
   "type": "M2O",
   "target": "categories",
   "alias": "products",       // Reverse relation name
@@ -354,6 +365,15 @@ EXAMPLE M2M:
   "type": "M2M",
   "target": "tags",
   "alias": "products"
+}
+
+EXAMPLE M2M with custom junction table:
+{
+  "name": "tags",
+  "type": "M2M",
+  "target": "tags",
+  "alias": "products",
+  "through": "product_tag_mapping"  // Custom junction table name
 }`,
                         inputSchema: {
                             type: "object",
@@ -403,6 +423,11 @@ EXAMPLE M2M:
                                             type: "array",
                                             items: { type: "string" },
                                             description: "Target tables for M2A (polymorphic) relationships",
+                                        },
+                                        through: {
+                                            type: "string",
+                                            description:
+                                                "Custom junction table name for M2M/M2A relationships (max 63 chars). If not provided, auto-generated as {source}_{target}_{name}_junction",
                                         },
                                     },
                                     required: ["name", "type"],

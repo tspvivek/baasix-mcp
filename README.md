@@ -177,7 +177,7 @@ If you're using the published npm package instead of the source:
 
 ## Available Tools
 
-### Schema Management (12 tools)
+### Schema Management (13 tools)
 | Tool | Description |
 |------|-------------|
 | `baasix_list_schemas` | List all collections with search/pagination |
@@ -187,6 +187,7 @@ If you're using the published npm package instead of the source:
 | `baasix_delete_schema` | Delete a collection schema |
 | `baasix_add_index` | Add index to collection |
 | `baasix_remove_index` | Remove index from collection |
+| `baasix_migrate_indexes` | Add missing FK indexes to all collections |
 | `baasix_create_relationship` | Create M2O/O2M/M2M/M2A relationship |
 | `baasix_update_relationship` | Update existing relationship |
 | `baasix_delete_relationship` | Delete a relationship |
@@ -535,6 +536,7 @@ When using `baasix_create_relationship`:
 }
 
 // Many-to-Many (products ↔ tags)
+// Auto-generates junction table: products_tags_tags_junction
 {
   sourceCollection: "products",
   relationshipData: {
@@ -544,7 +546,39 @@ When using `baasix_create_relationship`:
     alias: "products"
   }
 }
+
+// Many-to-Many with custom junction table name
+// Useful when auto-generated name exceeds PostgreSQL's 63 char limit
+{
+  sourceCollection: "products",
+  relationshipData: {
+    type: "M2M",
+    name: "tags",
+    target: "tags",
+    alias: "products",
+    through: "product_tags"  // Custom junction table name (max 63 chars)
+  }
+}
+
+// Many-to-Any (polymorphic - comments can belong to posts OR products)
+{
+  sourceCollection: "comments",
+  relationshipData: {
+    type: "M2A",
+    name: "commentable",
+    tables: ["posts", "products"],
+    alias: "comments",
+    through: "comment_refs"  // Optional custom junction table name
+  }
+}
 ```
+
+### Junction Tables (M2M/M2A)
+
+- **Auto-generated name**: `{source}_{target}_{name}_junction`
+- **Custom name**: Use `through` property (max 63 characters for PostgreSQL)
+- **Schema property**: Junction tables have `isJunction: true` in their schema definition
+- **Auto-indexed**: Foreign key columns are automatically indexed for better query performance
 
 ## Permission Structure
 
