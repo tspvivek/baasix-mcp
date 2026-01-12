@@ -1693,9 +1693,9 @@ The realtime config is stored in the schema definition and can include specific 
 
     async handleCreateSchema(args) {
         const { collection, schema } = args;
-        const result = await baasixRequest(`/schemas/${collection}`, {
+        const result = await baasixRequest(`/schemas`, {
             method: "POST",
-            data: schema,
+            data: { collectionName: collection, schema },
         });
         return {
             content: [
@@ -1710,8 +1710,8 @@ The realtime config is stored in the schema definition and can include specific 
     async handleUpdateSchema(args) {
         const { collection, schema } = args;
         const result = await baasixRequest(`/schemas/${collection}`, {
-            method: "PUT",
-            data: schema,
+            method: "PATCH",
+            data: { schema },
         });
         return {
             content: [
