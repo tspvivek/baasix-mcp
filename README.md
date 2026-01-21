@@ -1,3 +1,19 @@
+# ⚠️ THIS REPOSITORY HAS MOVED ⚠️
+
+> **This repository is no longer maintained. The project has been moved to a monorepo.**
+>
+> ### 👉 [New Repository: github.com/baasix/baasix](https://github.com/baasix/baasix)
+>
+> **New package name: `@baasix/mcp`**
+>
+> The MCP Server is now part of the Baasix monorepo at `packages/mcp`.
+>
+> ```bash
+> npm install @baasix/mcp
+> ```
+
+---
+
 # Baasix MCP Server
 
 A Model Context Protocol (MCP) server that provides Claude Desktop and other MCP clients with direct access to Baasix Backend-as-a-Service operations.
